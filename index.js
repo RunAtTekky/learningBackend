@@ -1,12 +1,15 @@
 import http from "http";
-import gfName from "./features.js";
-import { gfName2, gfName3 } from "./features.js";
+import { generateLovePercent } from "./features.js";
 
-console.log(gfName2 + "\n" + gfName3);
+console.log(generateLovePercent());
 
 const server = http.createServer((req, res) => {
   console.log(req.url);
-  res.end("<h1>Noice</h1>");
+  if (req.url === "/about") {
+    res.end("<h1>About</h1>");
+  } else if (req.url === "/love") {
+    res.end(`<h1>Love is ${generateLovePercent()}</h1>`);
+  }
 });
 
 server.listen(5000, () => {
