@@ -1,13 +1,12 @@
 import express from "express";
+import path from "path";
 
 const app = express();
 const port = 5000;
 
-app.get("/getProducts", (req, res) => {
-  res.json({
-    success: true,
-    products: ["football", "net", "goalpost"],
-  });
+app.get("/", (req, res) => {
+  const pathLocation = path.resolve();
+  res.sendFile(path.join(pathLocation, "./index.html"));
 });
 
 app.listen(port, () => {
