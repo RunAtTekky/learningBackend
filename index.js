@@ -14,6 +14,7 @@ mongoose
 const userSchema = new mongoose.Schema({
   name: String,
   email: String,
+  password: String,
 });
 
 const User = mongoose.model("User", userSchema);
@@ -37,7 +38,7 @@ const isAuthenticated = async (req, res, next) => {
 
     next();
   } else {
-    res.render("login");
+    res.redirect("/login");
   }
 };
 
@@ -45,13 +46,44 @@ app.get("/", isAuthenticated, (req, res) => {
   res.render("logout", { name: req.user.name });
 });
 
+app.get("/register", (req, res) => {
+  res.render("register");
+});
+
+app.get("/login", (req, res) => {
+  res.render("login");
+});
+
 app.post("/login", async (req, res) => {
-  const { name, email } = req.body;
+  const { email, password } = req.body;
+  let user = await User.findOne({ email });
+
+  if (!user) return res.redirect("/register");
+
+  const isMatch = user.password === password;
+
+  if (!isMatch) return res.render("login", { message: "Incorrect Password" });
+
+  const token = jwt.sign({ _id: user._id }, "aoeuaoeuaoeu");
+
+  res.cookie("token", token, {
+    httpOnly: true,
+    expires: new Date(Date.now() + 60 * 1000),
+  });
+
+  res.redirect("/");
+});
+
+app.post("/register", async (req, res) => {
+  const { name, email, password } = req.body;
   if (name === "" || email === "") {
-    res.redirect("/");
-    return;
+    return res.redirect("/");
   }
-  const user = await User.create({ name, email });
+  let user = await User.findOne({ email });
+  if (user) {
+    return res.redirect("/login");
+  }
+  user = await User.create({ name, email, password });
   const token = jwt.sign({ _id: user._id }, "aoeuaoeuaoeu");
   res.cookie("token", token, {
     httpOnly: true,
