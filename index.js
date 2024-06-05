@@ -4,13 +4,12 @@ import fs from "fs";
 
 console.log(generateLovePercent());
 
+const home = fs.readFileSync("./index.html");
+
 const server = http.createServer((req, res) => {
   console.log(req.url);
   if (req.url === "/home") {
-    fs.readFile("./index.html", (err, home) => {
-      console.log("File Read");
-      res.end(home);
-    });
+    res.end(home);
   } else if (req.url === "/about") {
     res.end("<h1>About</h1>");
   } else if (req.url === "/love") {
