@@ -2,11 +2,13 @@ import express from "express";
 import path from "path";
 
 const app = express();
+
+// Setting up view engine
+app.set("view engine", "ejs");
 const port = 5000;
 
 app.get("/", (req, res) => {
-  const pathLocation = path.resolve();
-  res.sendFile(path.join(pathLocation, "./index.html"));
+  res.render("index", { name: "Varun" });
 });
 
 app.listen(port, () => {
