@@ -15,6 +15,10 @@ app.get("/", (req, res) => {
   res.render("index");
 });
 
+app.get("/add", (req, res) => {
+  res.send("NOICE");
+});
+
 app.get("/success", (req, res) => {
   res.render("success");
 });
