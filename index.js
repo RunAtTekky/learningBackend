@@ -1,6 +1,7 @@
 import express from "express";
 import path from "path";
 import mongoose from "mongoose";
+import cookieParser from "cookie-parser";
 
 mongoose
   .connect("mongodb://localhost:27017", {
@@ -21,35 +22,45 @@ const users = [];
 
 app.use(express.static(path.join(path.resolve(), "public")));
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // Setting up view engine
 app.set("view engine", "ejs");
 const port = 5000;
 
-app.get("/", (req, res) => {
-  console.log(req.cookie);
-  res.render("login");
+const isAuthenticated = (req, res, next) => {
+  const { token } = req.cookies;
+  if (token) {
+    next();
+  } else {
+    res.render("login");
+  }
+};
+
+app.get("/", isAuthenticated, (req, res) => {
+  res.render("logout");
 });
 
-app.post("/login", (req, res) => {
-  res.cookie("token", "iamin");
+app.post("/login", async (req, res) => {
+  res.cookie("token", "iamin", {
+    httpOnly: true,
+    expires: new Date(Date.now() + 60 * 1000),
+  });
+  const { name, email } = req.body;
+  await Message.create({ name, email });
   res.redirect("/");
 });
 
-app.get("/add", async (req, res) => {
-  await Message.create({ name: "Annu", email: "varun@google.com" });
-  res.send("NOICE");
+app.get("/logout", (req, res) => {
+  res.cookie("token", null, {
+    httpOnly: true,
+    expires: new Date(Date.now()),
+  });
+  res.redirect("/");
 });
 
 app.get("/success", (req, res) => {
   res.render("success");
-});
-
-app.post("/contact", async (req, res) => {
-  const { name, email } = req.body;
-  await Message.create({ name, email });
-
-  res.redirect("/success");
 });
 
 app.get("/users", (req, res) => {
