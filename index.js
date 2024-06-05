@@ -27,7 +27,13 @@ app.set("view engine", "ejs");
 const port = 5000;
 
 app.get("/", (req, res) => {
-  res.render("index");
+  console.log(req.cookie);
+  res.render("login");
+});
+
+app.post("/login", (req, res) => {
+  res.cookie("token", "iamin");
+  res.redirect("/");
 });
 
 app.get("/add", async (req, res) => {
