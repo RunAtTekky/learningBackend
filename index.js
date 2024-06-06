@@ -62,7 +62,8 @@ app.post("/login", async (req, res) => {
 
   const isMatch = user.password === password;
 
-  if (!isMatch) return res.render("login", { message: "Incorrect Password" });
+  if (!isMatch)
+    return res.render("login", { email: email, message: "Incorrect Password" });
 
   const token = jwt.sign({ _id: user._id }, "aoeuaoeuaoeu");
 
